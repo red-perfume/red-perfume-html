@@ -103,8 +103,8 @@ function replaceSemanticClassWithAtomizedClasses (node, classToReplace, newClass
  * Replace the original classnames with the atomized versions.
  * Reserialize HTML to string.
  *
- * @param  {object} options       Options object from user containing verbose/customLogger
- * @return {string}               String of HTML with the class names replaced
+ * @param  {object} options  Options object from user containing verbose/customLogger
+ * @return {object}          Object of atomized markup and array of errors
  */
 const atomize = function (options) {
   const markupErrors = [];

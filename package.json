@@ -24,6 +24,7 @@
     "eslint-config-tjw-base": "^1.0.0",
     "eslint-config-tjw-jest": "^1.0.0",
     "eslint-config-tjw-jsdoc": "^1.0.0",
+    "eslint-plugin-jest": "^25.3.0",
     "eslint-plugin-jsdoc": "^36.0.8",
     "jest": "24.9.0",
     "red-perfume-css": "^0.4.0"
