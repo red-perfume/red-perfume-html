@@ -26,16 +26,25 @@ describe('Red Perfume', () => {
       test('Empty', () => {
         let consoleError = console.error;
         console.error = jest.fn();
+        const atomizedHtml = '<html><head></head><body></body></html>';
 
-        expect(redPerfumeHtml.atomize())
-          .toEqual(undefined);
+        expect(redPerfumeHtml())
+          .toEqual({
+            atomizedHtml,
+            markupErrors: [
+              'Error parsing HTML'
+            ]
+          });
 
         expect(console.error)
-          .toHaveBeenCalledWith(testHelpers.trimIndentation(`
-            _________________________
-            Red-Perfume:
-            options.tasks Must be an array of objects. See documentation for details.
-          `, 12));
+          .toHaveBeenCalledWith(
+            testHelpers.trimIndentation(`
+              _________________________
+              Red-Perfume:
+              Error parsing HTML
+            `, 14),
+            atomizedHtml
+          );
 
         console.error = consoleError;
         consoleError = undefined;
@@ -52,9 +61,9 @@ describe('Red Perfume', () => {
           }
         };
 
-        expect(redPerfumeHtml.atomize(options))
+        expect(redPerfumeHtml(options))
           .toEqual({
-            atomizedHtml: '<!DOCTYPE html><html><head></head><body><div class="rp__0 rp__1"></div></body></html>'),
+            atomizedHtml: '<!DOCTYPE html><html><head></head><body><div class="rp__0 rp__1"></div></body></html>',
             markupErrors: []
           });
 
@@ -86,8 +95,8 @@ describe('Red Perfume', () => {
                   '.rp__margin__--COLON10px'
                 ]
               }
-            }
-            const { atomizedHtml, markupErrors } = redPerfumeHtml.atomize(options);
+            };
+            const { atomizedHtml, markupErrors } = redPerfumeHtml(options);
 
             expect(testHelpers.trimIndentation(atomizedHtml))
               .toEqual(testHelpers.trimIndentation(`
@@ -118,7 +127,7 @@ describe('Red Perfume', () => {
               }
             };
 
-            const { atomizedHtml, markupErrors } = redPerfumeHtml.atomize(options);
+            const { atomizedHtml, markupErrors } = redPerfumeHtml(options);
 
             expect(testHelpers.trimIndentation(atomizedHtml))
               .toEqual(testHelpers.trimIndentation(`
@@ -153,7 +162,7 @@ describe('Red Perfume', () => {
               }
             };
 
-            const { atomizedHtml, markupErrors } = redPerfumeHtml.atomize(options);
+            const { atomizedHtml, markupErrors } = redPerfumeHtml(options);
 
             expect(testHelpers.trimIndentation(atomizedHtml))
               .toEqual(testHelpers.trimIndentation(`
@@ -163,7 +172,7 @@ describe('Red Perfume', () => {
                     <div class="nested"></div>
                   </div>
                 </body></html>
-              `, 30));
+              `, 16));
 
             expect(markupErrors)
               .toEqual([]);
@@ -186,7 +195,7 @@ describe('Red Perfume', () => {
               }
             };
 
-            const { atomizedHtml, markupErrors } = redPerfumeHtml.atomize(options);
+            const { atomizedHtml, markupErrors } = redPerfumeHtml(options);
 
             expect(testHelpers.trimIndentation(atomizedHtml))
               .toEqual(testHelpers.trimIndentation(`
@@ -196,7 +205,7 @@ describe('Red Perfume', () => {
                     <div class="nested"></div>
                   </div>
                 </body></html>
-              `, 30));
+              `, 16));
 
             expect(markupErrors)
               .toEqual([]);
