@@ -7,7 +7,7 @@
  */
 
 const redPerfumeHtml = require('../index.js');
-const validator = require('@/validator.js')
+const validator = require('@/validator.js');
 
 const testHelpers = require('@@/testHelpers.js');
 
