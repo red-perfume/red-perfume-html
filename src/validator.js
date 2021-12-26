@@ -43,7 +43,7 @@ const validator = {
     if (!key) {
       key = undefined;
     }
-    return key;
+    return key || {};
   },
   /**
    * Validates a value is a string.
@@ -61,7 +61,7 @@ const validator = {
     if (!key) {
       key = undefined;
     }
-    return key;
+    return key || '';
   },
 
   /**

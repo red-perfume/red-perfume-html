@@ -89,7 +89,7 @@ describe('Validator', () => {
   describe('validateObject', () => {
     test('Falsy', () => {
       expect(validator.validateObject(options, false, 'message'))
-        .toEqual(undefined);
+        .toEqual({});
 
       expect(options.customLogger)
         .not.toHaveBeenCalled();
@@ -97,7 +97,7 @@ describe('Validator', () => {
 
     test('Non-object', () => {
       expect(validator.validateObject(options, 'key', 'message'))
-        .toEqual(undefined);
+        .toEqual({});
 
       expect(options.customLogger)
         .toHaveBeenCalledWith('message', undefined);
@@ -117,7 +117,7 @@ describe('Validator', () => {
   describe('validateString', () => {
     test('Falsy', () => {
       expect(validator.validateString(options, false, 'message'))
-        .toEqual(undefined);
+        .toEqual('');
 
       expect(options.customLogger)
         .not.toHaveBeenCalled();
@@ -125,7 +125,7 @@ describe('Validator', () => {
 
     test('Non-string', () => {
       expect(validator.validateString(options, {}, 'message'))
-        .toEqual(undefined);
+        .toEqual('');
 
       expect(options.customLogger)
         .toHaveBeenCalledWith('message', undefined);
@@ -194,7 +194,9 @@ describe('Validator', () => {
       let consoleError;
 
       const DEFAULT_OUTPUT = Object.freeze({
-        verbose: true
+        verbose: true,
+        classMap: {},
+        input: ''
       });
 
       beforeEach(() => {
