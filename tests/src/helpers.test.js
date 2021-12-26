@@ -67,5 +67,13 @@ describe('helpers', () => {
       expect(console.error)
         .toHaveBeenCalledWith(output);
     });
+
+    test('Verbose false', () => {
+      options = { verbose: false };
+      helpers.throwError(options, 'Message');
+
+      expect(console.error)
+        .not.toHaveBeenCalled();
+    });
   });
 });
