@@ -51,168 +51,69 @@ describe('Red Perfume', () => {
       });
     });
 
-    describe('Valid options with tasks', () => {
-      test('Using data and afterOutput hook', () => {
-        options = {
-          ...options,
-          input: '<!DOCTYPE html><html><body><div class="example"></div></body></html>',
-          classMap: {
-            '.example': ['.rp__0', '.rp__1']
-          }
-        };
+    // More detailed CSS tests go in the other test files
+    describe('One simple integration test', () => {
+      const input = '<!DOCTYPE html><html><body><div class="simple"></div></body></html>';
+      const cssInput = `
+        .simple {
+          padding: 10px;
+          margin: 10px;
+        }
+      `;
 
-        expect(redPerfumeHtml(options))
-          .toEqual({
-            atomizedHtml: '<!DOCTYPE html><html><head></head><body><div class="rp__0 rp__1"></div></body></html>',
-            markupErrors: []
-          });
+      describe('Simple', () => {
+        test('Normal', () => {
+          options = {
+            ...options,
+            input,
+            classMap: testHelpers.produceClassMap(cssInput, options.customLogger)
+          };
 
-        expect(options.customLogger)
-          .not.toHaveBeenCalled();
-      });
+          expect(redPerfumeHtml(options))
+            .toEqual({
+              atomizedHtml: [
+                '<!DOCTYPE html>',
+                '<html>',
+                '<head>',
+                '</head>',
+                '<body>',
+                '<div class="rp__padding__--COLON10px rp__margin__--COLON10px">',
+                '</div>',
+                '</body>',
+                '</html>'
+              ].join(''),
+              markupErrors: []
+            });
 
-      describe('Every type of CSS', () => {
-        const input = testHelpers.trimIndentation(`
-          <!DOCTYPE html>
-          <html>
-            <body>
-              <div class="simple pseudo"></div>
-              <div class="after">
-                <div class="nested"></div>
-              </div>
-            </body>
-          </html>
-        `, 10);
-
-        describe('Simple', () => {
-          test('Normal', () => {
-            options = {
-              ...options,
-              input,
-              classMap: {
-                '.simple': [
-                  '.rp__padding__--COLON10px',
-                  '.rp__margin__--COLON10px'
-                ]
-              }
-            };
-            const { atomizedHtml, markupErrors } = redPerfumeHtml(options);
-
-            expect(testHelpers.trimIndentation(atomizedHtml))
-              .toEqual(testHelpers.trimIndentation(`
-                <!DOCTYPE html><html><head></head><body>
-                  <div class="pseudo rp__padding__--COLON10px rp__margin__--COLON10px"></div>
-                  <div class="after">
-                    <div class="nested"></div>
-                  </div>
-                </body></html>
-              `, 16));
-
-            expect(markupErrors)
-              .toEqual([]);
-
-            expect(options.customLogger)
-              .not.toHaveBeenCalled();
-          });
-
-          test('Uglify', () => {
-            options = {
-              ...options,
-              input,
-              classMap: {
-                '.simple': [
-                  '.rp__0',
-                  '.rp__1'
-                ]
-              }
-            };
-
-            const { atomizedHtml, markupErrors } = redPerfumeHtml(options);
-
-            expect(testHelpers.trimIndentation(atomizedHtml))
-              .toEqual(testHelpers.trimIndentation(`
-                <!DOCTYPE html><html><head></head><body>
-                  <div class="pseudo rp__0 rp__1"></div>
-                  <div class="after">
-                    <div class="nested"></div>
-                  </div>
-                </body></html>
-              `, 16));
-
-            expect(markupErrors)
-              .toEqual([]);
-
-            expect(options.customLogger)
-              .not.toHaveBeenCalled();
-          });
+          expect(options.customLogger)
+            .not.toHaveBeenCalled();
         });
 
-        describe('Pseudo', () => {
-          test('Normal', () => {
-            options = {
-              ...options,
-              input,
-              classMap: {
-                '.pseudo': [
-                  '.rp__color__--COLON__--OCTOTHORPF00',
-                  '.rp__text-decoration__--COLONnone',
-                  '.rp__color__--COLON__--OCTOTHORPA00___-HOVER',
-                  '.rp__text-decoration__--COLONunderline___-HOVER'
-                ]
-              }
-            };
+        test('Uglify', () => {
+          options = {
+            ...options,
+            input,
+            classMap: testHelpers.produceClassMap(cssInput, options.customLogger, true)
+          };
 
-            const { atomizedHtml, markupErrors } = redPerfumeHtml(options);
+          expect(redPerfumeHtml(options))
+            .toEqual({
+              atomizedHtml: [
+                '<!DOCTYPE html>',
+                '<html>',
+                '<head>',
+                '</head>',
+                '<body>',
+                '<div class="rp__0 rp__1">',
+                '</div>',
+                '</body>',
+                '</html>'
+              ].join(''),
+              markupErrors: []
+            });
 
-            expect(testHelpers.trimIndentation(atomizedHtml))
-              .toEqual(testHelpers.trimIndentation(`
-                <!DOCTYPE html><html><head></head><body>
-                  <div class="simple rp__color__--COLON__--OCTOTHORPF00 rp__text-decoration__--COLONnone rp__color__--COLON__--OCTOTHORPA00___-HOVER rp__text-decoration__--COLONunderline___-HOVER"></div>
-                  <div class="after">
-                    <div class="nested"></div>
-                  </div>
-                </body></html>
-              `, 16));
-
-            expect(markupErrors)
-              .toEqual([]);
-
-            expect(options.customLogger)
-              .not.toHaveBeenCalled();
-          });
-
-          test('Uglify', () => {
-            options = {
-              ...options,
-              input,
-              classMap: {
-                '.pseudo': [
-                  '.rp__0',
-                  '.rp__1',
-                  '.rp__2',
-                  '.rp__3'
-                ]
-              }
-            };
-
-            const { atomizedHtml, markupErrors } = redPerfumeHtml(options);
-
-            expect(testHelpers.trimIndentation(atomizedHtml))
-              .toEqual(testHelpers.trimIndentation(`
-                <!DOCTYPE html><html><head></head><body>
-                  <div class="simple rp__0 rp__1 rp__2 rp__3"></div>
-                  <div class="after">
-                    <div class="nested"></div>
-                  </div>
-                </body></html>
-              `, 16));
-
-            expect(markupErrors)
-              .toEqual([]);
-
-            expect(options.customLogger)
-              .not.toHaveBeenCalled();
-          });
+          expect(options.customLogger)
+            .not.toHaveBeenCalled();
         });
       });
     });
