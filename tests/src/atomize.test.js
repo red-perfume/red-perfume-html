@@ -49,134 +49,154 @@ describe('HTML', () => {
   });
 
   describe('Process HTML', () => {
-    test('Half comment', () => {
-      options.input = '><!--';
-      options = validator.validateOptions(options);
+    describe('Edge cases', () => {
+      test('Half comment', () => {
+        options.input = '><!--';
+        options = validator.validateOptions(options);
 
-      expect(atomize(options))
-        .toEqual({
-          atomizedHtml: '<html><head></head><body>&gt;<!----></body></html>',
-          markupErrors: []
+        expect(atomize(options))
+          .toEqual({
+            atomizedHtml: '<html><head></head><body>&gt;<!----></body></html>',
+            markupErrors: []
+          });
+
+        expect(options.customLogger)
+          .not.toHaveBeenCalled();
+      });
+
+      test('No matching classes in map', () => {
+        options = validator.validateOptions({
+          ...options,
+          input: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="example">Good</h1></body></html>',
+          classMap: {
+            '.test': [
+              '.rp__background__--COLON__--OCTOTHORPF00'
+            ]
+          }
         });
 
-      expect(options.customLogger)
-        .not.toHaveBeenCalled();
+        expect(atomize(options))
+          .toEqual({
+            atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="example">Good</h1></body></html>',
+            markupErrors: []
+          });
+
+        expect(options.customLogger)
+          .not.toHaveBeenCalled();
+      });
     });
 
-    test('One rule', () => {
-      options.input = '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="test">Good</h1></body></html>';
-      options.classMap = {
-        '.test': [
-          '.rp__background__--COLON__--OCTOTHORPF00'
-        ]
-      };
-      options = validator.validateOptions(options);
+    describe('One rule', () => {
+      const input = '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="test">Good</h1></body></html>';
 
-      expect(atomize(options))
-        .toEqual({
-          atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="rp__background__--COLON__--OCTOTHORPF00">Good</h1></body></html>',
-          markupErrors: []
+      test('Normal', () => {
+        options = validator.validateOptions({
+          ...options,
+          input,
+          classMap: {
+            '.test': [
+              '.rp__background__--COLON__--OCTOTHORPF00'
+            ]
+          }
         });
 
-      expect(options.customLogger)
-        .not.toHaveBeenCalled();
+        expect(atomize(options))
+          .toEqual({
+            atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="rp__background__--COLON__--OCTOTHORPF00">Good</h1></body></html>',
+            markupErrors: []
+          });
+
+        expect(options.customLogger)
+          .not.toHaveBeenCalled();
+      });
+
+      test('Uglified', () => {
+        options = validator.validateOptions({
+          ...options,
+          input,
+          classMap: {
+            '.test': [
+              '.rp__0'
+            ]
+          }
+        });
+
+        expect(atomize(options))
+          .toEqual({
+            atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="rp__0">Good</h1></body></html>',
+            markupErrors: []
+          });
+
+        expect(options.customLogger)
+          .not.toHaveBeenCalled();
+      });
     });
 
-    test('One rule uglified', () => {
-      options.classMap = {
-        '.test': [
-          '.rp__0'
-        ]
-      };
-      options.input = '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="test">Good</h1></body></html>';
-      options = validator.validateOptions(options);
+    describe('Two rules, two properties', () => {
+      const input = '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="test example">Good</h1></body></html>';
 
-      expect(atomize(options))
-        .toEqual({
-          atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="rp__0">Good</h1></body></html>',
-          markupErrors: []
+      test('Normal', () => {
+        options = validator.validateOptions({
+          ...options,
+          input,
+          classMap: {
+            '.test': [
+              '.rp__background__--COLON__--OCTOTHORPF00',
+              '.rp__width__--COLON100px'
+            ],
+            '.example': [
+              '.rp__color__--COLON__--blue',
+              '.rp__padding__--COLON__--20px'
+            ]
+          }
         });
 
-      expect(options.customLogger)
-        .not.toHaveBeenCalled();
-    });
+        expect(atomize(options))
+          .toEqual({
+            atomizedHtml: [
+              '<!DOCTYPE html>',
+              '<html lang="en">',
+              '<head>',
+              '</head>',
+              '<body>',
+              '<h1 class="rp__background__--COLON__--OCTOTHORPF00 rp__width__--COLON100px rp__color__--COLON__--blue rp__padding__--COLON__--20px">',
+              'Good',
+              '</h1>',
+              '</body>',
+              '</html>'
+            ].join(''),
+            markupErrors: []
+          });
 
-    test('Two rules, two properties', () => {
-      options.classMap = {
-        '.test': [
-          '.rp__background__--COLON__--OCTOTHORPF00',
-          '.rp__width__--COLON100px'
-        ],
-        '.example': [
-          '.rp__color__--COLON__--blue',
-          '.rp__padding__--COLON__--20px'
-        ]
-      };
-      options.input = '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="test example">Good</h1></body></html>';
-      options = validator.validateOptions(options);
+        expect(options.customLogger)
+          .not.toHaveBeenCalled();
+      });
 
-      expect(atomize(options))
-        .toEqual({
-          atomizedHtml: [
-            '<!DOCTYPE html>',
-            '<html lang="en">',
-            '<head>',
-            '</head>',
-            '<body>',
-            '<h1 class="rp__background__--COLON__--OCTOTHORPF00 rp__width__--COLON100px rp__color__--COLON__--blue rp__padding__--COLON__--20px">',
-            'Good',
-            '</h1>',
-            '</body>',
-            '</html>'
-          ].join(''),
-          markupErrors: []
+      test('Uglified', () => {
+        options = validator.validateOptions({
+          ...options,
+          input,
+          classMap: {
+            '.test': [
+              '.rp__0',
+              '.rp__1'
+            ],
+            '.example': [
+              '.rp__2',
+              '.rp__3'
+            ]
+          }
         });
 
-      expect(options.customLogger)
-        .not.toHaveBeenCalled();
-    });
+        expect(atomize(options))
+          .toEqual({
+            atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="rp__0 rp__1 rp__2 rp__3">Good</h1></body></html>',
+            markupErrors: []
+          });
 
-    test('Two rules, two properties uglified', () => {
-      options.classMap = {
-        '.test': [
-          '.rp__0',
-          '.rp__1'
-        ],
-        '.example': [
-          '.rp__2',
-          '.rp__3'
-        ]
-      };
-      options.input = '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="test example">Good</h1></body></html>';
-      options = validator.validateOptions(options);
-
-      expect(atomize(options))
-        .toEqual({
-          atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="rp__0 rp__1 rp__2 rp__3">Good</h1></body></html>',
-          markupErrors: []
-        });
-
-      expect(options.customLogger)
-        .not.toHaveBeenCalled();
-    });
-
-    test('No matching classes in map', () => {
-      options.classMap = {
-        '.test': [
-          '.rp__background__--COLON__--OCTOTHORPF00'
-        ]
-      };
-      options.input = '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="example">Good</h1></body></html>';
-      options = validator.validateOptions(options);
-
-      expect(atomize(options))
-        .toEqual({
-          atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="example">Good</h1></body></html>',
-          markupErrors: []
-        });
-
-      expect(options.customLogger)
-        .not.toHaveBeenCalled();
+        expect(options.customLogger)
+          .not.toHaveBeenCalled();
+      });
     });
   });
 });
