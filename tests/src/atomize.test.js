@@ -8,6 +8,7 @@
 
 const atomize = require('@/atomize.js');
 const validator = require('@/validator.js');
+const testHelpers = require('@@/testHelpers.js');
 
 describe('HTML', () => {
   let options;
@@ -68,11 +69,7 @@ describe('HTML', () => {
         options = validator.validateOptions({
           ...options,
           input: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="example">Good</h1></body></html>',
-          classMap: {
-            '.test': [
-              '.rp__background__--COLON__--OCTOTHORPF00'
-            ]
-          }
+          classMap: testHelpers.produceClassMap('.test { background: #F00 }', options.customLogger)
         });
 
         expect(atomize(options))
@@ -88,78 +85,25 @@ describe('HTML', () => {
 
     describe('One rule', () => {
       const input = '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="test">Good</h1></body></html>';
+      const inputCss = '.test { background: #F00 }';
 
       test('Normal', () => {
         options = validator.validateOptions({
           ...options,
           input,
-          classMap: {
-            '.test': [
-              '.rp__background__--COLON__--OCTOTHORPF00'
-            ]
-          }
+          classMap: testHelpers.produceClassMap(inputCss, options.customLogger)
         });
 
         expect(atomize(options))
           .toEqual({
             atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="rp__background__--COLON__--OCTOTHORPF00">Good</h1></body></html>',
-            markupErrors: []
-          });
-
-        expect(options.customLogger)
-          .not.toHaveBeenCalled();
-      });
-
-      test('Uglified', () => {
-        options = validator.validateOptions({
-          ...options,
-          input,
-          classMap: {
-            '.test': [
-              '.rp__0'
-            ]
-          }
-        });
-
-        expect(atomize(options))
-          .toEqual({
-            atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="rp__0">Good</h1></body></html>',
-            markupErrors: []
-          });
-
-        expect(options.customLogger)
-          .not.toHaveBeenCalled();
-      });
-    });
-
-    describe('Two rules, two properties', () => {
-      const input = '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="test example">Good</h1></body></html>';
-
-      test('Normal', () => {
-        options = validator.validateOptions({
-          ...options,
-          input,
-          classMap: {
-            '.test': [
-              '.rp__background__--COLON__--OCTOTHORPF00',
-              '.rp__width__--COLON100px'
-            ],
-            '.example': [
-              '.rp__color__--COLON__--blue',
-              '.rp__padding__--COLON__--20px'
-            ]
-          }
-        });
-
-        expect(atomize(options))
-          .toEqual({
             atomizedHtml: [
               '<!DOCTYPE html>',
               '<html lang="en">',
               '<head>',
               '</head>',
               '<body>',
-              '<h1 class="rp__background__--COLON__--OCTOTHORPF00 rp__width__--COLON100px rp__color__--COLON__--blue rp__padding__--COLON__--20px">',
+              '<h1 class="rp__background__--COLON__--OCTOTHORPF00">',
               'Good',
               '</h1>',
               '</body>',
@@ -176,16 +120,66 @@ describe('HTML', () => {
         options = validator.validateOptions({
           ...options,
           input,
-          classMap: {
-            '.test': [
-              '.rp__0',
-              '.rp__1'
-            ],
-            '.example': [
-              '.rp__2',
-              '.rp__3'
-            ]
-          }
+          classMap: testHelpers.produceClassMap(inputCss, options.customLogger, true)
+        });
+
+        expect(atomize(options))
+          .toEqual({
+            atomizedHtml: '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="rp__0">Good</h1></body></html>',
+            markupErrors: []
+          });
+
+        expect(options.customLogger)
+          .not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Two rules, two properties', () => {
+      const input = '<!DOCTYPE html><html lang="en"><head></head><body><h1 class="test example">Good</h1></body></html>';
+      const inputCss = `
+        .test {
+          background: #F00;
+          width: 100px
+        }
+        .example {
+          color: blue;
+          padding: 20px;
+        }
+      `;
+
+      test('Normal', () => {
+        options = validator.validateOptions({
+          ...options,
+          input,
+          classMap: testHelpers.produceClassMap(inputCss, options.customLogger)
+        });
+
+        expect(atomize(options))
+          .toEqual({
+            atomizedHtml: [
+              '<!DOCTYPE html>',
+              '<html lang="en">',
+              '<head>',
+              '</head>',
+              '<body>',
+              '<h1 class="rp__background__--COLON__--OCTOTHORPF00 rp__width__--COLON100px rp__color__--COLONblue rp__padding__--COLON20px">',
+              'Good',
+              '</h1>',
+              '</body>',
+              '</html>'
+            ].join(''),
+            markupErrors: []
+          });
+
+        expect(options.customLogger)
+          .not.toHaveBeenCalled();
+      });
+
+      test('Uglified', () => {
+        options = validator.validateOptions({
+          ...options,
+          input,
+          classMap: testHelpers.produceClassMap(inputCss, options.customLogger, true)
         });
 
         expect(atomize(options))

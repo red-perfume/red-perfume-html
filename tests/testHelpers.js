@@ -5,7 +5,24 @@
  * @author  TheJaredWilcurt
  */
 
+const redPerfumeCss = require('red-perfume-css');
+
 const testHelpers = {
+  /**
+   * Produce a classMap using Red Perfume CSS from a string of CSS.
+   *
+   * @param  {string}   input         A string of CSS
+   * @param  {Function} customLogger  Callback function for errors
+   * @param  {boolean}  uglify        Whether to uglify the output
+   * @return {object}                 A class map
+   */
+  produceClassMap: function (input, customLogger, uglify) {
+    uglify = !!uglify;
+    const verbose = true;
+    const options = { verbose, customLogger, input, uglify };
+    const result = redPerfumeCss(options);
+    return result.classMap;
+  },
   /**
    * The errno value from a failed fs read/write is a different
    * value on different OS's. Since we don't care about the type
