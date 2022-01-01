@@ -192,5 +192,65 @@ describe('HTML', () => {
           .not.toHaveBeenCalled();
       });
     });
+
+    describe('Nested selectors', () => {
+      const input = [
+        '<!DOCTYPE html><html lang="en"><head></head><body>',
+        '<div class="test">',
+        '<p class="nested"></p>',
+        '</div>',
+        '</body></html>'
+      ].join('');
+      const inputCss = `
+        .test { background: #F00 }
+        .test .nested { padding: 10px }
+      `;
+
+      test('Normal', () => {
+        options = validator.validateOptions({
+          ...options,
+          input,
+          classMap: testHelpers.produceClassMap(inputCss, options.customLogger)
+        });
+
+        expect(atomize(options))
+          .toEqual({
+            atomizedHtml: [
+              '<!DOCTYPE html><html lang="en"><head></head><body>',
+              '<div class="rp__background__--COLON__--OCTOTHORPF00">',
+              '<p class="rp__padding__--COLON10px"></p>',
+              '</div>',
+              '</body></html>'
+            ].join(''),
+            markupErrors: []
+          });
+
+        expect(options.customLogger)
+          .not.toHaveBeenCalled();
+      });
+
+      test('Uglified', () => {
+        options = validator.validateOptions({
+          ...options,
+          input,
+          classMap: testHelpers.produceClassMap(inputCss, options.customLogger, true)
+        });
+
+        expect(atomize(options))
+          .toEqual({
+            atomizedHtml: [
+              '<!DOCTYPE html><html lang="en"><head></head><body>',
+              '<div class="rp__0">',
+              '<p class="rp__1"></p>',
+              '</div>',
+              '</body></html>'
+            ].join(''),
+            markupErrors: []
+          });
+
+        expect(options.customLogger)
+          .not.toHaveBeenCalled();
+      });
+    });
   });
 });
