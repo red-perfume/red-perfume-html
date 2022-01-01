@@ -55,4 +55,4 @@ const uglifiedHtml = redPerfumeHtml({
   input: inputMarkup
 });
 
-console.log({ normalHtml, uglifiedHtml });
+console.log({ inputMarkup, normalHtml, uglifiedHtml });

@@ -1,6 +1,6 @@
 {
   "name": "red-perfume-html",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Atomizer of CSS classes in HTML strings",
   "main": "index.js",
   "scripts": {
@@ -24,8 +24,8 @@
     "eslint-config-tjw-base": "^1.0.0",
     "eslint-config-tjw-jest": "^1.0.0",
     "eslint-config-tjw-jsdoc": "^1.0.0",
-    "eslint-plugin-jest": "^25.3.0",
-    "eslint-plugin-jsdoc": "^36.0.8",
+    "eslint-plugin-jest": "^25.3.3",
+    "eslint-plugin-jsdoc": "^37.5.0",
     "jest": "24.9.0",
     "red-perfume-css": "^0.4.0"
   },
