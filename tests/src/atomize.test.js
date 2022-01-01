@@ -217,8 +217,8 @@ describe('HTML', () => {
           .toEqual({
             atomizedHtml: [
               '<!DOCTYPE html><html lang="en"><head></head><body>',
-              '<div class="rp__background__--COLON__--OCTOTHORPF00">',
-              '<p class="rp__padding__--COLON10px"></p>',
+              '<div class="rp__background__--COLON__--OCTOTHORPF00 rp__padding__--COLON10px_---PARENT1">',
+              '<p class="rp__padding__--COLON10px_---CHILD"></p>',
               '</div>',
               '</body></html>'
             ].join(''),
@@ -240,8 +240,8 @@ describe('HTML', () => {
           .toEqual({
             atomizedHtml: [
               '<!DOCTYPE html><html lang="en"><head></head><body>',
-              '<div class="rp__0">',
-              '<p class="rp__1"></p>',
+              '<div class="rp__0 rp__1">',
+              '<p class="rp__2"></p>',
               '</div>',
               '</body></html>'
             ].join(''),
