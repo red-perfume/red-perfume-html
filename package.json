@@ -27,7 +27,7 @@
     "eslint-plugin-jest": "^25.3.3",
     "eslint-plugin-jsdoc": "^37.5.0",
     "jest": "24.9.0",
-    "red-perfume-css": "^0.4.0"
+    "red-perfume-css": "^0.4.1"
   },
   "homepage": "https://github.com/red-perfume/red-perfume-html#readme",
   "repository": {
